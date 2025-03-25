@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../core/blocs/video/video_cubit.dart';
 import '../../core/models/video.dart';
-import '../../core/providers/video_providers.dart';
 
-class VideoListItem extends ConsumerWidget {
+class VideoListItem extends StatelessWidget {
   final Video video;
   final VoidCallback onTap;
 
@@ -15,7 +15,7 @@ class VideoListItem extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(
@@ -89,7 +89,7 @@ class VideoListItem extends ConsumerWidget {
                                 : Icons.favorite_border,
                             color: video.isFavorite ? Colors.red : null,
                           ),
-                          onPressed: () => _toggleFavorite(ref),
+                          onPressed: () => _toggleFavorite(context),
                           iconSize: 20,
                           constraints: const BoxConstraints(),
                           padding: EdgeInsets.zero,
@@ -127,7 +127,7 @@ class VideoListItem extends ConsumerWidget {
     }
   }
 
-  void _toggleFavorite(WidgetRef ref) {
-    ref.read(toggleFavoriteProvider(video.id));
+  void _toggleFavorite(BuildContext context) {
+    context.read<VideoCubit>().toggleFavorite(video.id);
   }
 } 

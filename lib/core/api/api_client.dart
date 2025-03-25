@@ -8,9 +8,7 @@ class ApiClient {
   late final Dio _dio;
   final AppLogger _logger = AppLogger();
   
-  // Get the appropriate base URL based on platform
   static String get baseUrl {
-    // Running on a physical device or emulator
     if (!kIsWeb) {
       if (Platform.isAndroid) {
         // Android emulator uses 10.0.2.2 to access host's localhost
@@ -20,7 +18,6 @@ class ApiClient {
         return 'http://localhost:8080/api';
       }
     }
-    // Default fallback
     return 'http://localhost:8080/api';
   }
   
@@ -37,7 +34,6 @@ class ApiClient {
       ),
     );
     
-    // Add DioLogger in debug mode
     if (kDebugMode) {
       DioLogger(
         logger: _logger,
@@ -49,7 +45,6 @@ class ApiClient {
     }
   }
   
-  // Generic GET method
   Future<dynamic> get(String path, {Map<String, dynamic>? queryParameters}) async {
     try {
       _logger.d('GET request to: $path');
@@ -63,7 +58,6 @@ class ApiClient {
     }
   }
   
-  // Generic POST method
   Future<dynamic> post(String path, {dynamic data}) async {
     try {
       _logger.d('POST request to: $path');
@@ -77,7 +71,6 @@ class ApiClient {
     }
   }
   
-  // Generic PUT method
   Future<dynamic> put(String path, {dynamic data}) async {
     try {
       _logger.d('PUT request to: $path');
@@ -91,7 +84,6 @@ class ApiClient {
     }
   }
   
-  // Generic DELETE method
   Future<dynamic> delete(String path) async {
     try {
       _logger.d('DELETE request to: $path');
@@ -102,7 +94,6 @@ class ApiClient {
     }
   }
   
-  // Error handling
   dynamic _handleError(DioException error) {
     String errorMessage;
     

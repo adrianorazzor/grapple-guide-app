@@ -1,21 +1,29 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/blocs/category/category_cubit.dart';
+import '../../core/blocs/category/category_state.dart';
 import '../../core/models/category.dart';
-import '../../core/providers/category_providers.dart';
 import 'category_card.dart';
 
-class CategoriesScreen extends ConsumerWidget {
+class CategoriesScreen extends StatelessWidget {
   const CategoriesScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final categoriesAsync = ref.watch(categoriesProvider);
+  Widget build(BuildContext context) {
+    // Load categories when the screen builds
+    _loadCategories(context);
     
     return Scaffold(
       appBar: AppBar(
         title: const Text('BJJ Categories'),
+        leading: Navigator.canPop(context)
+            ? IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () => Navigator.of(context).pop(),
+              )
+            : null,
         actions: [
           IconButton(
             icon: const Icon(Icons.favorite),
@@ -30,38 +38,50 @@ class CategoriesScreen extends ConsumerWidget {
           ),
         ],
       ),
-      body: categoriesAsync.when(
-        data: (categories) => _buildCategoriesList(context, categories),
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stackTrace) => Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(
-                Icons.error_outline,
-                color: Colors.red,
-                size: 60,
+      body: BlocBuilder<CategoryCubit, CategoryState>(
+        builder: (context, state) {
+          if (state is CategoryLoading) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (state is CategoryLoaded) {
+            return _buildCategoriesList(context, state.categories);
+          } else if (state is CategoryError) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.error_outline,
+                    color: Colors.red,
+                    size: 60,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Error loading categories',
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    state.message,
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () => _loadCategories(context),
+                    child: const Text('Retry'),
+                  ),
+                ],
               ),
-              const SizedBox(height: 16),
-              Text(
-                'Error loading categories',
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                error.toString(),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () => ref.refresh(categoriesProvider),
-                child: const Text('Retry'),
-              ),
-            ],
-          ),
-        ),
+            );
+          } else {
+            return const Center(child: Text('Select a category to view videos'));
+          }
+        },
       ),
     );
+  }
+
+  void _loadCategories(BuildContext context) {
+    context.read<CategoryCubit>().loadCategories();
   }
 
   Widget _buildCategoriesList(BuildContext context, List<Category> categories) {

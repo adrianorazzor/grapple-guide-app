@@ -31,7 +31,7 @@ final appRouter = GoRouter(
       path: '/categories/:categoryId',
       builder: (context, state) {
         final categoryId = state.pathParameters['categoryId']!;
-        return VideosScreen(categoryId: categoryId);
+        return VideosScreen(categoryId: int.parse(categoryId));
       },
     ),
     
@@ -40,7 +40,7 @@ final appRouter = GoRouter(
       path: '/videos/:videoId',
       builder: (context, state) {
         final videoId = state.pathParameters['videoId']!;
-        return VideoDetailsScreen(videoId: videoId);
+        return VideoDetailsScreen(videoId: int.parse(videoId));
       },
     ),
   ],

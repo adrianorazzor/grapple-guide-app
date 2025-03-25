@@ -16,7 +16,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Video {
 
- String get id; String get title; String get categoryId; String get description; String get videoUrl; String get thumbnailUrl; String get instructor; bool get isFavorite; String get notes; Duration get duration;
+ int get id; String get title; int get categoryId; String get description; String get videoUrl; String get thumbnailUrl; String get instructor; bool get isFavorite; String get notes; Duration get duration;
 /// Create a copy of Video
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -49,7 +49,7 @@ abstract mixin class $VideoCopyWith<$Res>  {
   factory $VideoCopyWith(Video value, $Res Function(Video) _then) = _$VideoCopyWithImpl;
 @useResult
 $Res call({
- String id, String title, String categoryId, String description, String videoUrl, String thumbnailUrl, String instructor, bool isFavorite, String notes, Duration duration
+ int id, String title, int categoryId, String description, String videoUrl, String thumbnailUrl, String instructor, bool isFavorite, String notes, Duration duration
 });
 
 
@@ -69,9 +69,9 @@ class _$VideoCopyWithImpl<$Res>
 @pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? title = null,Object? categoryId = null,Object? description = null,Object? videoUrl = null,Object? thumbnailUrl = null,Object? instructor = null,Object? isFavorite = null,Object? notes = null,Object? duration = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
+as int,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,categoryId: null == categoryId ? _self.categoryId : categoryId // ignore: cast_nullable_to_non_nullable
-as String,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
+as int,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String,videoUrl: null == videoUrl ? _self.videoUrl : videoUrl // ignore: cast_nullable_to_non_nullable
 as String,thumbnailUrl: null == thumbnailUrl ? _self.thumbnailUrl : thumbnailUrl // ignore: cast_nullable_to_non_nullable
 as String,instructor: null == instructor ? _self.instructor : instructor // ignore: cast_nullable_to_non_nullable
@@ -92,9 +92,9 @@ class _Video implements Video {
    _Video({required this.id, required this.title, required this.categoryId, this.description = '', this.videoUrl = '', this.thumbnailUrl = '', this.instructor = '', this.isFavorite = false, this.notes = '', this.duration = Duration.zero});
   factory _Video.fromJson(Map<String, dynamic> json) => _$VideoFromJson(json);
 
-@override final  String id;
+@override final  int id;
 @override final  String title;
-@override final  String categoryId;
+@override final  int categoryId;
 @override@JsonKey() final  String description;
 @override@JsonKey() final  String videoUrl;
 @override@JsonKey() final  String thumbnailUrl;
@@ -136,7 +136,7 @@ abstract mixin class _$VideoCopyWith<$Res> implements $VideoCopyWith<$Res> {
   factory _$VideoCopyWith(_Video value, $Res Function(_Video) _then) = __$VideoCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String title, String categoryId, String description, String videoUrl, String thumbnailUrl, String instructor, bool isFavorite, String notes, Duration duration
+ int id, String title, int categoryId, String description, String videoUrl, String thumbnailUrl, String instructor, bool isFavorite, String notes, Duration duration
 });
 
 
@@ -156,9 +156,9 @@ class __$VideoCopyWithImpl<$Res>
 @override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? title = null,Object? categoryId = null,Object? description = null,Object? videoUrl = null,Object? thumbnailUrl = null,Object? instructor = null,Object? isFavorite = null,Object? notes = null,Object? duration = null,}) {
   return _then(_Video(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
+as int,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,categoryId: null == categoryId ? _self.categoryId : categoryId // ignore: cast_nullable_to_non_nullable
-as String,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
+as int,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String,videoUrl: null == videoUrl ? _self.videoUrl : videoUrl // ignore: cast_nullable_to_non_nullable
 as String,thumbnailUrl: null == thumbnailUrl ? _self.thumbnailUrl : thumbnailUrl // ignore: cast_nullable_to_non_nullable
 as String,instructor: null == instructor ? _self.instructor : instructor // ignore: cast_nullable_to_non_nullable

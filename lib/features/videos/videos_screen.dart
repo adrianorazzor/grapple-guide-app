@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/blocs/category/category_cubit.dart';
+import '../../core/blocs/category/category_state.dart';
+import '../../core/blocs/video/video_cubit.dart';
+import '../../core/blocs/video/video_state.dart';
 import '../../core/models/video.dart';
-import '../../core/providers/category_providers.dart';
-import '../../core/providers/video_providers.dart';
 import 'video_list_item.dart';
 
-class VideosScreen extends ConsumerWidget {
-  final String categoryId;
+class VideosScreen extends StatelessWidget {
+  final int categoryId;
 
   const VideosScreen({
     super.key,
@@ -16,22 +18,24 @@ class VideosScreen extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    // Set the selected category ID in the provider
-    ref.read(selectedCategoryIdProvider.notifier).state = categoryId;
-    
-    // Watch for the current category details
-    final categoryAsync = ref.watch(categoryProvider(categoryId));
-    
-    // Watch for videos in this category
-    final videosAsync = ref.watch(videosProvider);
+  Widget build(BuildContext context) {
+    // Set the selected category ID and load data when the screen builds
+    _initData(context);
     
     return Scaffold(
       appBar: AppBar(
-        title: categoryAsync.when(
-          data: (category) => Text(category.name),
-          loading: () => const Text('Loading...'),
-          error: (_, __) => const Text('Videos'),
+        title: BlocBuilder<CategoryCubit, CategoryState>(
+          builder: (context, state) {
+            if (state is SingleCategoryLoaded) {
+              return Text(state.category.name);
+            } else {
+              return const Text('Videos');
+            }
+          },
+        ),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.go('/categories'),
         ),
         actions: [
           IconButton(
@@ -47,38 +51,57 @@ class VideosScreen extends ConsumerWidget {
           ),
         ],
       ),
-      body: videosAsync.when(
-        data: (videos) => _buildVideosList(context, videos),
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stackTrace) => Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(
-                Icons.error_outline,
-                color: Colors.red,
-                size: 60,
+      body: BlocBuilder<VideoCubit, VideoState>(
+        builder: (context, state) {
+          if (state is VideoLoading) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (state is VideoLoaded) {
+            return _buildVideosList(context, state.videos);
+          } else if (state is VideoError) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.error_outline,
+                    color: Colors.red,
+                    size: 60,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Error loading videos',
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    state.message,
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () => _loadVideos(context),
+                    child: const Text('Retry'),
+                  ),
+                ],
               ),
-              const SizedBox(height: 16),
-              Text(
-                'Error loading videos',
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                error.toString(),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () => ref.refresh(videosProvider),
-                child: const Text('Retry'),
-              ),
-            ],
-          ),
-        ),
+            );
+          } else {
+            return const Center(child: Text('Select a category to view videos'));
+          }
+        },
       ),
     );
+  }
+
+  void _initData(BuildContext context) {
+    // Select the category and load videos when the screen is first built
+    context.read<CategoryCubit>().selectCategory(categoryId);
+    context.read<CategoryCubit>().loadCategory(categoryId);
+    _loadVideos(context);
+  }
+
+  void _loadVideos(BuildContext context) {
+    context.read<VideoCubit>().loadVideos();
   }
 
   Widget _buildVideosList(BuildContext context, List<Video> videos) {

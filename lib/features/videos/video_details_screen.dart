@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../core/blocs/video/video_cubit.dart';
+import '../../core/blocs/video/video_state.dart';
 import '../../core/models/video.dart';
-import '../../core/providers/video_providers.dart';
 
-class VideoDetailsScreen extends ConsumerStatefulWidget {
-  final String videoId;
+class VideoDetailsScreen extends StatefulWidget {
+  final int videoId;
 
   const VideoDetailsScreen({
     super.key,
@@ -13,12 +15,22 @@ class VideoDetailsScreen extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<VideoDetailsScreen> createState() => _VideoDetailsScreenState();
+  State<VideoDetailsScreen> createState() => _VideoDetailsScreenState();
 }
 
-class _VideoDetailsScreenState extends ConsumerState<VideoDetailsScreen> {
+class _VideoDetailsScreenState extends State<VideoDetailsScreen> {
   final TextEditingController _notesController = TextEditingController();
   bool _isEditingNotes = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadVideo();
+  }
+
+  void _loadVideo() {
+    context.read<VideoCubit>().loadVideo(widget.videoId);
+  }
 
   @override
   void dispose() {
@@ -28,58 +40,86 @@ class _VideoDetailsScreenState extends ConsumerState<VideoDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final videoAsync = ref.watch(videoProvider(widget.videoId));
-
     return Scaffold(
       appBar: AppBar(
-        title: videoAsync.when(
-          data: (video) => Text(video.title),
-          loading: () => const Text('Loading...'),
-          error: (_, __) => const Text('Video Details'),
+        title: BlocBuilder<VideoCubit, VideoState>(
+          builder: (context, state) {
+            if (state is SingleVideoLoaded) {
+              return Text(state.video.title);
+            } else {
+              return const Text('Video Details');
+            }
+          },
+        ),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            final categoryId = context.read<VideoCubit>().getCategoryId();
+            if (categoryId != null) {
+              context.go('/categories/$categoryId');
+            } else {
+              context.go('/categories');
+            }
+          },
         ),
         actions: [
-          videoAsync.maybeWhen(
-            data: (video) => IconButton(
-              icon: Icon(
-                video.isFavorite ? Icons.favorite : Icons.favorite_border,
-                color: video.isFavorite ? Colors.red : null,
-              ),
-              onPressed: () => _toggleFavorite(video.id),
-            ),
-            orElse: () => const SizedBox.shrink(),
+          BlocBuilder<VideoCubit, VideoState>(
+            builder: (context, state) {
+              if (state is SingleVideoLoaded) {
+                return IconButton(
+                  icon: Icon(
+                    state.video.isFavorite ? Icons.favorite : Icons.favorite_border,
+                    color: state.video.isFavorite ? Colors.red : null,
+                  ),
+                  onPressed: () => _toggleFavorite(state.video.id),
+                );
+              } else {
+                return const SizedBox.shrink();
+              }
+            },
           ),
         ],
       ),
-      body: videoAsync.when(
-        data: (video) => _buildVideoDetails(context, video),
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stackTrace) => Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(
-                Icons.error_outline,
-                color: Colors.red,
-                size: 60,
+      body: BlocBuilder<VideoCubit, VideoState>(
+        builder: (context, state) {
+          if (state is VideoLoading) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (state is SingleVideoLoaded) {
+            return _buildVideoDetails(context, state.video);
+          } else if (state is VideoError) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.error_outline,
+                    color: Colors.red,
+                    size: 60,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Error loading video',
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    state.message,
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: _loadVideo,
+                    child: const Text('Retry'),
+                  ),
+                ],
               ),
-              const SizedBox(height: 16),
-              Text(
-                'Error loading video',
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                error.toString(),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () => ref.refresh(videoProvider(widget.videoId)),
-                child: const Text('Retry'),
-              ),
-            ],
-          ),
-        ),
+            );
+          } else {
+            return const Center(
+              child: Text('Video not found'),
+            );
+          }
+        },
       ),
     );
   }
@@ -255,19 +295,11 @@ class _VideoDetailsScreenState extends ConsumerState<VideoDetailsScreen> {
     }
   }
 
-  void _toggleFavorite(String videoId) {
-    ref.read(toggleFavoriteProvider(videoId));
+  void _toggleFavorite(int id) {
+    context.read<VideoCubit>().toggleFavorite(id);
   }
 
-  void _saveNotes(String videoId) {
-    // Here we would call the API to save the notes
-    // For now, just showing a snackbar
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Notes saved'),
-      ),
-    );
-    
+  void _saveNotes(int id) {
     setState(() {
       _isEditingNotes = false;
     });

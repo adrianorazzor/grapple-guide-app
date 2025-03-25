@@ -16,7 +16,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Category {
 
-@JsonKey(name: 'id')@IdConverter() String get id; String get name; String get description; String get imageUrl; int get videoCount;
+@JsonKey(name: 'id') int get id; String get name; String get description; String get imageUrl; int get videoCount;
 /// Create a copy of Category
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -49,7 +49,7 @@ abstract mixin class $CategoryCopyWith<$Res>  {
   factory $CategoryCopyWith(Category value, $Res Function(Category) _then) = _$CategoryCopyWithImpl;
 @useResult
 $Res call({
-@JsonKey(name: 'id')@IdConverter() String id, String name, String description, String imageUrl, int videoCount
+@JsonKey(name: 'id') int id, String name, String description, String imageUrl, int videoCount
 });
 
 
@@ -69,7 +69,7 @@ class _$CategoryCopyWithImpl<$Res>
 @pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? description = null,Object? imageUrl = null,Object? videoCount = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as int,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String,imageUrl: null == imageUrl ? _self.imageUrl : imageUrl // ignore: cast_nullable_to_non_nullable
 as String,videoCount: null == videoCount ? _self.videoCount : videoCount // ignore: cast_nullable_to_non_nullable
@@ -84,10 +84,10 @@ as int,
 @JsonSerializable()
 
 class _Category implements Category {
-   _Category({@JsonKey(name: 'id')@IdConverter() required this.id, required this.name, this.description = '', this.imageUrl = '', this.videoCount = 0});
+   _Category({@JsonKey(name: 'id') required this.id, required this.name, this.description = '', this.imageUrl = '', this.videoCount = 0});
   factory _Category.fromJson(Map<String, dynamic> json) => _$CategoryFromJson(json);
 
-@override@JsonKey(name: 'id')@IdConverter() final  String id;
+@override@JsonKey(name: 'id') final  int id;
 @override final  String name;
 @override@JsonKey() final  String description;
 @override@JsonKey() final  String imageUrl;
@@ -126,7 +126,7 @@ abstract mixin class _$CategoryCopyWith<$Res> implements $CategoryCopyWith<$Res>
   factory _$CategoryCopyWith(_Category value, $Res Function(_Category) _then) = __$CategoryCopyWithImpl;
 @override @useResult
 $Res call({
-@JsonKey(name: 'id')@IdConverter() String id, String name, String description, String imageUrl, int videoCount
+@JsonKey(name: 'id') int id, String name, String description, String imageUrl, int videoCount
 });
 
 
@@ -146,7 +146,7 @@ class __$CategoryCopyWithImpl<$Res>
 @override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? description = null,Object? imageUrl = null,Object? videoCount = null,}) {
   return _then(_Category(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as int,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String,imageUrl: null == imageUrl ? _self.imageUrl : imageUrl // ignore: cast_nullable_to_non_nullable
 as String,videoCount: null == videoCount ? _self.videoCount : videoCount // ignore: cast_nullable_to_non_nullable

@@ -6,9 +6,9 @@ part 'video.g.dart';
 @Freezed(copyWith: true)
 abstract class Video with _$Video {
   factory Video({
-    required String id,
+    required int id,
     required String title,
-    required String categoryId,
+    required int categoryId,
     @Default('') String description,
     @Default('') String videoUrl,
     @Default('') String thumbnailUrl,
