@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../services/video_service.dart';
 import '../category/category_cubit.dart';
 import '../category/category_state.dart';
+import '../../models/video.dart';
 import 'video_state.dart';
 
 class VideoCubit extends Cubit<VideoState> {
@@ -39,6 +40,20 @@ class VideoCubit extends Cubit<VideoState> {
     
     result.fold(
       (video) => emit(SingleVideoLoaded(video)),
+      (error) => emit(VideoError(error.toString())),
+    );
+  }
+  
+  Future<void> createVideo(Video video) async {
+    emit(VideoLoading());
+    
+    final result = await _videoService.createVideo(video);
+    
+    result.fold(
+      (createdVideo) async {
+        // Reload the videos to include the new one
+        await loadVideos();
+      },
       (error) => emit(VideoError(error.toString())),
     );
   }

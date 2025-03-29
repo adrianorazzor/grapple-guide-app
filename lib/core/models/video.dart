@@ -10,12 +10,12 @@ abstract class Video with _$Video {
     required String title,
     required int categoryId,
     @Default('') String description,
-    @Default('') String videoUrl,
+    @Default('') String url,
     @Default('') String thumbnailUrl,
     @Default('') String instructor,
     @Default(false) bool isFavorite,
     @Default('') String notes,
-    @Default(Duration.zero) Duration duration,
+    @Default(0) int durationSeconds,
   }) = _Video;
 
   factory Video.fromJson(Map<String, dynamic> json) => _$VideoFromJson(json);

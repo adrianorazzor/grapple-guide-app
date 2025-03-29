@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'dart:io' show Platform;
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 import '../../core/models/category.dart';
 
@@ -14,11 +16,14 @@ class CategoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Determine if we're on desktop platforms
+    final bool isDesktop = kIsWeb || (Platform.isWindows || Platform.isLinux || Platform.isMacOS);
+    
     return Card(
       clipBehavior: Clip.antiAlias,
       elevation: 4,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(isDesktop ? 12 : 16),
       ),
       child: InkWell(
         onTap: onTap,
@@ -36,7 +41,7 @@ class CategoryCard extends StatelessWidget {
                 : _buildPlaceholder(),
             ),
             Padding(
-              padding: const EdgeInsets.all(12),
+              padding: EdgeInsets.all(isDesktop ? 8.0 : 12.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -44,31 +49,36 @@ class CategoryCard extends StatelessWidget {
                     category.name,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
+                      fontSize: isDesktop ? 14 : null,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                   if (category.description.isNotEmpty) ...[
-                    const SizedBox(height: 4),
+                    SizedBox(height: isDesktop ? 2 : 4),
                     Text(
                       category.description,
-                      style: Theme.of(context).textTheme.bodySmall,
-                      maxLines: 2,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        fontSize: isDesktop ? 11 : null,
+                      ),
+                      maxLines: isDesktop ? 1 : 2,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ],
-                  const SizedBox(height: 4),
+                  SizedBox(height: isDesktop ? 2 : 4),
                   Row(
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.video_library,
-                        size: 16,
+                        size: isDesktop ? 14 : 16,
                         color: Colors.blue,
                       ),
-                      const SizedBox(width: 4),
+                      SizedBox(width: isDesktop ? 2 : 4),
                       Text(
                         '${category.videoCount} videos',
-                        style: Theme.of(context).textTheme.bodySmall,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          fontSize: isDesktop ? 10 : null,
+                        ),
                       ),
                     ],
                   ),
@@ -82,11 +92,14 @@ class CategoryCard extends StatelessWidget {
   }
 
   Widget _buildPlaceholder() {
+    // Determine if we're on desktop platforms
+    final bool isDesktop = kIsWeb || (Platform.isWindows || Platform.isLinux || Platform.isMacOS);
+    
     return Container(
       color: Colors.blue.shade100,
       child: Icon(
         Icons.category,
-        size: 48,
+        size: isDesktop ? 36 : 48,
         color: Colors.blue.shade700,
       ),
     );

@@ -68,12 +68,12 @@ class VideoService {
         title: video.title,
         categoryId: video.categoryId,
         description: video.description,
-        videoUrl: video.videoUrl,
+        url: video.url,
         thumbnailUrl: video.thumbnailUrl,
         instructor: video.instructor,
         isFavorite: video.isFavorite,
         notes: video.notes,
-        durationInSeconds: video.duration.inSeconds,
+        durationInSeconds: video.durationSeconds,
       );
       
       // Create in remote
@@ -102,12 +102,12 @@ class VideoService {
         title: video.title,
         categoryId: video.categoryId,
         description: video.description,
-        videoUrl: video.videoUrl,
+        url: video.url,
         thumbnailUrl: video.thumbnailUrl,
         instructor: video.instructor,
         isFavorite: video.isFavorite,
         notes: video.notes,
-        durationInSeconds: video.duration.inSeconds,
+        durationInSeconds: video.durationSeconds,
       );
       
       // Update in remote
@@ -161,12 +161,12 @@ class VideoService {
           title: video.title,
           categoryId: video.categoryId,
           description: video.description,
-          videoUrl: video.videoUrl,
+          url: video.url,
           thumbnailUrl: video.thumbnailUrl,
           instructor: video.instructor,
           isFavorite: video.isFavorite,
           notes: video.notes,
-          durationInSeconds: video.duration.inSeconds,
+          durationInSeconds: video.durationSeconds,
         );
         
         // Toggle in remote

@@ -78,7 +78,7 @@ class VideoListItem extends StatelessWidget {
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          _formatDuration(video.duration),
+                          _formatDuration(video.durationSeconds),
                           style: Theme.of(context).textTheme.bodySmall,
                         ),
                         const Spacer(),
@@ -119,11 +119,15 @@ class VideoListItem extends StatelessWidget {
     );
   }
 
-  String _formatDuration(Duration duration) {
-    if (duration.inHours > 0) {
-      return '${duration.inHours}:${(duration.inMinutes % 60).toString().padLeft(2, '0')}:${(duration.inSeconds % 60).toString().padLeft(2, '0')}';
+  String _formatDuration(int durationSeconds) {
+    final hours = durationSeconds ~/ 3600;
+    final minutes = (durationSeconds % 3600) ~/ 60;
+    final seconds = durationSeconds % 60;
+
+    if (hours > 0) {
+      return '$hours:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
     } else {
-      return '${duration.inMinutes}:${(duration.inSeconds % 60).toString().padLeft(2, '0')}';
+      return '$minutes:${seconds.toString().padLeft(2, '0')}';
     }
   }
 

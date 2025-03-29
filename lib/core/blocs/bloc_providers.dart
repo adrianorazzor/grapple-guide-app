@@ -29,7 +29,10 @@ List<BlocProvider> getAppBlocProviders() {
   
   // Create cubits
   final loggerCubit = LoggerCubit(logger: logger);
-  final categoryCubit = CategoryCubit(categoryService: categoryService);
+  final categoryCubit = CategoryCubit(
+    categoryService: categoryService,
+    videoService: videoService,
+  );
   
   return [
     BlocProvider<LoggerCubit>(

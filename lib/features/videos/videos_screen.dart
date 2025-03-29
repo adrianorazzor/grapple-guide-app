@@ -51,6 +51,11 @@ class VideosScreen extends StatelessWidget {
           ),
         ],
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => context.go('/categories/$categoryId/add-video'),
+        tooltip: 'Add Video',
+        child: const Icon(Icons.video_call),
+      ),
       body: BlocBuilder<VideoCubit, VideoState>(
         builder: (context, state) {
           if (state is VideoLoading) {

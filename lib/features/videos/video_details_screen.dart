@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import '../../core/blocs/video/video_cubit.dart';
 import '../../core/blocs/video/video_state.dart';
 import '../../core/models/video.dart';
+import 'video_player_widget.dart';
+import 'simple_youtube_player.dart';
 
 class VideoDetailsScreen extends StatefulWidget {
   final int videoId;
@@ -130,20 +132,10 @@ class _VideoDetailsScreenState extends State<VideoDetailsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Video thumbnail/preview
+          // Video player or thumbnail
           ClipRRect(
             borderRadius: BorderRadius.circular(12),
-            child: AspectRatio(
-              aspectRatio: 16 / 9,
-              child: video.thumbnailUrl.isNotEmpty
-                  ? Image.network(
-                      video.thumbnailUrl,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) =>
-                          _buildThumbnailPlaceholder(),
-                    )
-                  : _buildThumbnailPlaceholder(),
-            ),
+            child: _buildVideoPlayer(video),
           ),
           
           const SizedBox(height: 20),
@@ -162,7 +154,7 @@ class _VideoDetailsScreenState extends State<VideoDetailsScreen> {
           if (video.instructor.isNotEmpty)
             _buildInfoRow(Icons.person, 'Instructor: ${video.instructor}'),
           
-          _buildInfoRow(Icons.timer, 'Duration: ${_formatDuration(video.duration)}'),
+          _buildInfoRow(Icons.timer, 'Duration: ${_formatDuration(video.durationSeconds)}'),
           
           const SizedBox(height: 16),
           
@@ -186,6 +178,31 @@ class _VideoDetailsScreenState extends State<VideoDetailsScreen> {
           _buildNotesSection(video),
         ],
       ),
+    );
+  }
+
+  Widget _buildVideoPlayer(Video video) {
+    // For YouTube videos
+    if (video.url.isNotEmpty && video.url.contains('youtube')) {
+      return SimpleYouTubePlayer(youtubeUrl: video.url);
+    }
+    
+    // For direct video URLs (mp4, etc.)
+    if (video.url.isNotEmpty) {
+      return VideoPlayerWidget(videoUrl: video.url);
+    }
+    
+    // Fallback to thumbnail or placeholder
+    return AspectRatio(
+      aspectRatio: 16 / 9,
+      child: video.thumbnailUrl.isNotEmpty
+          ? Image.network(
+              video.thumbnailUrl,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) =>
+                  _buildThumbnailPlaceholder(),
+            )
+          : _buildThumbnailPlaceholder(),
     );
   }
 
@@ -287,11 +304,15 @@ class _VideoDetailsScreenState extends State<VideoDetailsScreen> {
     );
   }
 
-  String _formatDuration(Duration duration) {
-    if (duration.inHours > 0) {
-      return '${duration.inHours}:${(duration.inMinutes % 60).toString().padLeft(2, '0')}:${(duration.inSeconds % 60).toString().padLeft(2, '0')}';
+  String _formatDuration(int durationSeconds) {
+    final hours = durationSeconds ~/ 3600;
+    final minutes = (durationSeconds % 3600) ~/ 60;
+    final seconds = durationSeconds % 60;
+
+    if (hours > 0) {
+      return '$hours:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
     } else {
-      return '${duration.inMinutes}:${(duration.inSeconds % 60).toString().padLeft(2, '0')}';
+      return '$minutes:${seconds.toString().padLeft(2, '0')}';
     }
   }
 

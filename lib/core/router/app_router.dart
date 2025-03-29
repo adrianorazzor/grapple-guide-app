@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/categories/categories_screen.dart';
+import '../../features/categories/add_category_screen.dart';
+import '../../features/videos/add_video_screen.dart';
 import '../../features/videos/video_details_screen.dart';
 import '../../features/videos/videos_screen.dart';
 import '../../features/common/splash_screen.dart';
@@ -26,12 +28,27 @@ final appRouter = GoRouter(
       builder: (context, state) => const CategoriesScreen(),
     ),
     
+    // Add Category Screen
+    GoRoute(
+      path: '/categories/add',
+      builder: (context, state) => const AddCategoryScreen(),
+    ),
+    
     // Videos Screen (within a category)
     GoRoute(
       path: '/categories/:categoryId',
       builder: (context, state) {
         final categoryId = state.pathParameters['categoryId']!;
         return VideosScreen(categoryId: int.parse(categoryId));
+      },
+    ),
+    
+    // Add Video Screen (within a category)
+    GoRoute(
+      path: '/categories/:categoryId/add-video',
+      builder: (context, state) {
+        final categoryId = state.pathParameters['categoryId']!;
+        return AddVideoScreen(categoryId: int.parse(categoryId));
       },
     ),
     

@@ -1,0 +1,243 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+
+# Development Guidelines
+These guidelines outline the best practices for developing robust and maintainable applications. Adhering to these principles ensures code quality, consistency, and efficient collaboration.
+
+
+## Key Principles
+*   **Functional and Declarative Programming:** Embrace functional and declarative programming patterns to enhance code clarity and predictability.
+    *   *Example:* Use `map`, `filter`, and `reduce` operations on collections instead of imperative loops.
+*   **Composition Over Inheritance:** Favor composition over inheritance to promote flexibility and reduce coupling between classes.
+    *   *Example:* Use composition to add functionality to widgets instead of deep inheritance hierarchies.
+*   **File Structure:** Organize files into logical sections for improved maintainability.
+    *   *Structure:* `exported_widget.dart`, `subwidgets.dart`, `helpers.dart`, `static_content.dart`, `types.dart`.
+
+
+## Use of Bloc/Cubit, Repositories, Services and Datasources
+*   **Bloc/Cubit classes:** Should mainly be used for managing the state of the UI.
+*   **Service classes:** This is the place where the bussiness logic rules should be placed.
+*   **Repository classes:** Should only be used to fetch data from external resources and should not deal with business logic.
+
+
+## Dart/Flutter
+*   **Arrow Syntax:** Employ arrow syntax for concise function and method definitions.
+    *   *Example:*
+
+
+    ```dart
+    int add(int a, int b) => a + b;
+    ```
+*   **Expression Bodies:** Prefer expression bodies for one-line getters and setters.
+    *   *Example:*
+
+
+    ```dart
+    int get value => _value;
+    set value(int newValue) => _value = newValue;
+    ```
+*   **Trailing Commas:** Use trailing commas to improve formatting and simplify version control diffs.
+    *   *Example:*
+
+
+    ```dart
+    MyWidget(
+      param1: 'value1',
+      param2: 'value2',
+    );
+    ```
+*   **Descriptive Variable Names:** Use descriptive variable names with auxiliary verbs to clearly indicate the purpose and state of variables.
+    *   *Example:* `isLoading`, `hasError`, `dataFetched`.
+
+
+## Bloc-Specific Guidelines
+*   **Context Access:** Use `context.read()` or `context.watch()` for accessing Cubit/Bloc states in widgets.
+    *   `context.read()` is used to get the cubit/bloc without listening to the changes.
+    *   `context.watch()` is used to get the cubit/bloc and listen to the changes.
+*   **State Transitions:** Handle state transitions and side effects within the Bloc to maintain a clear separation of concerns.
+*   **Meaningful Event Names:** Use descriptive and meaningful event names for Bloc events to improve code readability.
+    *   *Example:* `DataRequested`, `DataReceived`, `DataError`.
+*   **Equatable States:** Extend states with `Equatable` for immutability and efficient state comparison.
+    *   *Example:*
+
+
+    ```dart
+    class MyState extends Equatable {
+      final int value;
+
+
+      const MyState({required this.value});
+
+
+      @override
+      List<Object?> get props => [value];
+    }
+    ```
+*   **Cubit vs. Bloc:** Use Cubit for managing simple state and Bloc for complex event-driven state management.
+*   **BlocBuilder:** Use `BlocBuilder` for widgets that depend on Cubit/Bloc state to efficiently rebuild only when necessary.
+*   **BlocListener:** Use `BlocListener` for handling side effects, such as navigation or showing dialogs, in response to state changes.
+
+
+## Performance Optimization
+*   **`const` Widgets:** Use `const` widgets wherever possible to optimize rebuilds and improve performance.
+*   **List View Optimizations:** Implement list view optimizations, such as `ListView.builder`, to efficiently render large lists.
+*   **Image Handling:** Use `AssetImage` for static images and `cached_network_image` for remote images to improve loading times and reduce network usage.
+
+
+## UI and Styling
+*   **Flutter Widgets:** Leverage Flutter's built-in widgets and create custom widgets to build a consistent and visually appealing UI.
+*   **Responsive Design:** Implement responsive design using `LayoutBuilder` or `MediaQuery` to adapt the UI to different screen sizes and orientations.
+*   **Themes:** Use themes for consistent styling across the app to ensure a unified look and feel.
+*   **Text Styles:** Use `Theme.of(context).textTheme.titleLarge` instead of `headline6`, and `headlineSmall` instead of `headline5`, etc., to align with Flutter's updated text styling conventions.
+
+
+## Widgets and UI Components
+*   **Private Widget Classes:** Create small, private widget classes instead of methods like `Widget _build...` to improve code organization and reusability.
+*   **TextField Configuration:** In `TextFields`, set appropriate `textCapitalization`, `keyboardType`, and `textInputAction` to enhance user input.
+*   **RefreshIndicator:** Implement `RefreshIndicator` for pull-to-refresh functionality to allow users to refresh data.
+
+
+## Miscellaneous
+*   **LoggerUtils:** Use `AppLogger` instead of `print` for debugging to provide more detailed and configurable logging.
+*   **BlocObserver:** Use `BlocObserver` for monitoring state transitions during debugging to gain insights into the application's state management.
+
+
+## Documentation
+*   **Official Documentation:** Follow official Flutter, Bloc, and Firebase documentation for best practices and up-to-date information.
+
+### Break Down UI Into Focused Components
+
+```dart
+Widget build(BuildContext context) {
+  return Column(
+    children: [
+      _Header(title: state.title),
+      if (state.isLoading)
+        _LoadingIndicator(),
+      else if (state.isEmpty)
+        _EmptyState(),
+      else
+        _ItemsList(
+          items: state.items!,
+          selectedId: state.selectedId,
+          onItemTap: (id) => _handleItemTap(id),
+        ),
+    ],
+  );
+}
+```
+
+
+**Key Elements:**
+- Each component has a single responsibility
+- Pass only required props to each component
+- Use clear naming conventions
+
+
+### Use Callbacks for Actions
+
+```dart
+class _ItemButton extends StatelessWidget {
+  final String id;
+  final VoidCallback onTap;
+ 
+  const _ItemButton({
+    required this.id,
+    required this.onTap,
+  });
+ 
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      onPressed: onTap,
+      child: Text('Item $id'),
+    );
+  }
+}
+```
+
+**Key Elements:**
+- Pass callbacks for actions
+- Keep child components independent of bloc/state management
+- Define clear interfaces via constructor parameters
+
+
+### Apply Defensive Programming
+
+```dart
+if (items == null || items.isEmpty) {
+  return const _EmptyState();
+}
+
+
+return ListView(
+  children: items.map((item) => _ItemTile(
+    item: item,
+    isSelected: item.id == selectedId,
+    onTap: () => onItemTap(item.id),
+  )).toList(),
+);
+```
+
+**Key Elements:**
+- Add null checks
+- Handle empty collections
+- Use early returns for different states
+
+
+### Implement Consistent Styling
+
+```dart
+// In the state class
+static TextStyle get headerStyle => const TextStyle(
+  fontSize: 16,
+  fontWeight: FontWeight.bold,
+);
+
+
+// In the widget
+Text(
+  title,
+  style: MyWidgetState.headerStyle,
+)
+```
+
+
+**Key Elements:**
+- Centralize style definitions
+- Use constants for repeated values
+- Create helper methods for complex styling
+
+
+## General Best Practices
+1. **State Management**
+   - Keep state classes immutable
+   - Use computed properties for derived state
+   - Include only what's needed in props list
+
+
+2. **Component Design**
+   - Single responsibility principle
+   - Small, focused components
+   - Clear prop interfaces
+
+
+3. **Performance**
+   - Use const constructors when possible
+   - Implement equality checks via Equatable
+   - Optimize rebuilds with BlocSelector
+
+
+4. **Code Organization**
+   - Group related components
+   - Use clear naming conventions
+   - Add descriptive comments
+
+
+5. **User Experience**
+   - Handle loading, empty, and error states
+   - Provide clear feedback for user actions
+   - Ensure consistent styling

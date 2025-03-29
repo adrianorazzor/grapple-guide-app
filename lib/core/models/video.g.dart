@@ -11,15 +11,12 @@ _Video _$VideoFromJson(Map<String, dynamic> json) => _Video(
   title: json['title'] as String,
   categoryId: (json['categoryId'] as num).toInt(),
   description: json['description'] as String? ?? '',
-  videoUrl: json['videoUrl'] as String? ?? '',
+  url: json['url'] as String? ?? '',
   thumbnailUrl: json['thumbnailUrl'] as String? ?? '',
   instructor: json['instructor'] as String? ?? '',
   isFavorite: json['isFavorite'] as bool? ?? false,
   notes: json['notes'] as String? ?? '',
-  duration:
-      json['duration'] == null
-          ? Duration.zero
-          : Duration(microseconds: (json['duration'] as num).toInt()),
+  durationSeconds: (json['durationSeconds'] as num?)?.toInt() ?? 0,
 );
 
 Map<String, dynamic> _$VideoToJson(_Video instance) => <String, dynamic>{
@@ -27,10 +24,10 @@ Map<String, dynamic> _$VideoToJson(_Video instance) => <String, dynamic>{
   'title': instance.title,
   'categoryId': instance.categoryId,
   'description': instance.description,
-  'videoUrl': instance.videoUrl,
+  'url': instance.url,
   'thumbnailUrl': instance.thumbnailUrl,
   'instructor': instance.instructor,
   'isFavorite': instance.isFavorite,
   'notes': instance.notes,
-  'duration': instance.duration.inMicroseconds,
+  'durationSeconds': instance.durationSeconds,
 };

@@ -11,7 +11,7 @@ abstract class VideoDTO with _$VideoDTO {
     required String title,
     required int categoryId,
     String? description,
-    String? videoUrl,
+    String? url,
     String? thumbnailUrl,
     String? instructor,
     bool? isFavorite,
@@ -30,12 +30,12 @@ extension VideoDTOMapper on VideoDTO {
       title: title,
       categoryId: categoryId,
       description: description ?? '',
-      videoUrl: videoUrl ?? '',
+      url: url ?? '',
       thumbnailUrl: thumbnailUrl ?? '',
       instructor: instructor ?? '',
       isFavorite: isFavorite ?? false,
       notes: notes ?? '',
-      duration: Duration(seconds: durationInSeconds ?? 0),
+      durationSeconds: durationInSeconds ?? 0,
     );
   }
 }

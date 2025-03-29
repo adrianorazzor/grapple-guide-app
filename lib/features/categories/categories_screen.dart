@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'dart:io' show Platform;
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 import '../../core/blocs/category/category_cubit.dart';
 import '../../core/blocs/category/category_state.dart';
@@ -26,6 +28,11 @@ class CategoriesScreen extends StatelessWidget {
             : null,
         actions: [
           IconButton(
+            icon: const Icon(Icons.refresh),
+            tooltip: 'Refresh categories',
+            onPressed: () => _refreshCategories(context),
+          ),
+          IconButton(
             icon: const Icon(Icons.favorite),
             onPressed: () {
               // Navigate to Favorites in future enhancement
@@ -37,6 +44,11 @@ class CategoriesScreen extends StatelessWidget {
             },
           ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => context.go('/categories/add'),
+        tooltip: 'Add Category',
+        child: const Icon(Icons.add),
       ),
       body: BlocBuilder<CategoryCubit, CategoryState>(
         builder: (context, state) {
@@ -84,6 +96,19 @@ class CategoriesScreen extends StatelessWidget {
     context.read<CategoryCubit>().loadCategories();
   }
 
+  void _refreshCategories(BuildContext context) {
+    // First refresh the basic category data
+    _loadCategories(context);
+    
+    // Capture the BuildContext to avoid "use_build_context_synchronously" warning
+    final CategoryCubit cubit = context.read<CategoryCubit>();
+    
+    // Update video counts for each category
+    Future.delayed(const Duration(seconds: 1), () {
+      cubit.updateCategoryWithVideoCount();
+    });
+  }
+
   Widget _buildCategoriesList(BuildContext context, List<Category> categories) {
     if (categories.isEmpty) {
       return const Center(
@@ -91,13 +116,43 @@ class CategoriesScreen extends StatelessWidget {
       );
     }
 
+    // Determine if we're on Windows (desktop) or mobile
+    final bool isDesktop = kIsWeb || (Platform.isWindows || Platform.isLinux || Platform.isMacOS);
+    
+    // Screen width to calculate appropriate grid
+    final screenWidth = MediaQuery.of(context).size.width;
+    
+    // Adjust grid based on platform and screen width
+    int crossAxisCount = 2; // Default for mobile
+    double childAspectRatio = 1.0; // Default aspect ratio
+    
+    if (isDesktop) {
+      // For desktop, use more columns based on screen width
+      if (screenWidth > 1200) {
+        crossAxisCount = 5;
+        childAspectRatio = 0.8;
+      } else if (screenWidth > 800) {
+        crossAxisCount = 4;
+        childAspectRatio = 0.85;
+      } else {
+        crossAxisCount = 3;
+        childAspectRatio = 0.9;
+      }
+    } else {
+      // For mobile, adjust based on orientation
+      if (screenWidth > 600) {
+        crossAxisCount = 3;
+        childAspectRatio = 0.9;
+      }
+    }
+
     return GridView.builder(
       padding: const EdgeInsets.all(16),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 16,
-        mainAxisSpacing: 16,
-        childAspectRatio: 1,
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: crossAxisCount,
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
+        childAspectRatio: childAspectRatio,
       ),
       itemCount: categories.length,
       itemBuilder: (context, index) {
